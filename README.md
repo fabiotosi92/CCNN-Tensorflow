@@ -6,6 +6,9 @@ Tensorflow implementation of confidence estimation using a convolutional neural 
 [Matteo Poggi](https://vision.disi.unibo.it/~mpoggi/) and [Stefano Mattoccia](https://vision.disi.unibo.it/~smatt/Site/Home.html)   
 BMVC 2016
 
+![alt text](https://github.com/fabiotosi92/CCNN-Tensorflow/tree/master/images/disparity/ad-census/000020_LR.png)
+![alt text](https://github.com/fabiotosi92/CCNN-Tensorflow/tree/master/output/CCNN/ad-census/000020_LR.png)
+
 For more details:  
 [project page](https://vision.disi.unibo.it/~mpoggi/code.html)  
 [pdf](https://vision.disi.unibo.it/~mpoggi/papers/bmvc2016.pdf)  
