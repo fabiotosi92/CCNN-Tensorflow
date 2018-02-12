@@ -51,7 +51,7 @@ python ./model/main.py --isTraining False --batch_size 1 --dataset_testing ./uti
 
 You can download a pre-trained model in ./log
 
-The model was trained for 14 epochs, a batch size of 64, an initial learning rate of 0.003 (reduced to 0.0003 after 10 epochs) and patches of 9x9 extracted from disparity computed with AD-CENSUS algorithm.
+The model was trained for 14 epochs, a batch size of 64, an initial learning rate of 0.003 (reduced to 0.0003 after 10 epochs) and patches of 9x9 extracted from 20 disparity maps computed with AD-CENSUS algorithm on 000000_10..000019_10 stereo pairs of KITTI 12.
 
 ## Results
 
