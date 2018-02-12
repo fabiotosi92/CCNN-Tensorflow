@@ -1,0 +1,4 @@
+../images/disparity/ad-census/000020_LR.png;
+../images/disparity/ad-census/000021_LR.png;
+../images/disparity/ad-census/000022_LR.png;
+../images/disparity/ad-census/000023_LR.png;
