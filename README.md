@@ -10,13 +10,6 @@ BMVC 2016
 ![Alt text](https://github.com/fabiotosi92/CCNN-Tensorflow/blob/master/images/disparity/ad-census/000020_LR.png?raw=true "disparity")
 ![Alt text](https://github.com/fabiotosi92/CCNN-Tensorflow/blob/master/output/CCNN/ad-census/000020_LR.png?raw=true "confidence CCNN")
 
-<p align="center">
-  <img src="https://github.com/fabiotosi92/CCNN-Tensorflow/tree/master/images/disparity/ad-census/000020_LR.png" alt="disparity">
-</p>
-
-<p align="center">
-  <img src="https://github.com/fabiotosi92/CCNN-Tensorflow/tree/master/output/CCNN/ad-census/000020_LR.png" alt="confidence-CCNN">
-</p>
 
 For more details:  
 [project page](https://vision.disi.unibo.it/~mpoggi/code.html)  
@@ -33,7 +26,7 @@ Training takes about 15 minutes with the default parameters on 20 images of **KI
 python ./model/main.py --isTraining True --epoch 14 --batch_size 64 --patch_size 9 --dataset_training ./utils/kitti_training_set.txt --initial_learning_rate 0.003 --log_directory ./log --save_epoch_freq 2 --model_name CCNN.model 
 ```
 
-**Warning:** appropriately change of ./utils/kitti_training_set.txt is necessary to train from scratch the network. To this aim, it's provided a shell script to generate a new list file. 
+**Warning:** appropriately change of ./utils/kitti_training_set.txt is necessary to train from scratch the network. To this aim, it's provided a shell script to generate a new training file. 
 
 ```shell
 ./utils/kitti_generate_file.sh [path_disparities] [path_kitti_groundtruth] [index_from] [index_to] [output_file]
@@ -51,6 +44,14 @@ python ./model/main.py --isTraining False --batch_size 1 --dataset_testing ./uti
 
 You can download a pre-trained model in ./log
 
-The model was trained for 14 epochs, a batch size of 64, an initial learning rate of 0.003 (reduced to 0.0003 after 10 epochs) and patches of 9x9.
+The model was trained for 14 epochs, a batch size of 64, an initial learning rate of 0.003 (reduced to 0.0003 after 10 epochs) and patches of 9x9 extracted from disparity computed with AD-CENSUS algorithm.
 
-```
+## Results
+
+AUC comparison between Torch and Tensorflow implementation using disparity maps computed by AD-CENSUS algorithm on 173 testing images of **KITTI 2012**
+
+**Optimal AUC**: 0.1073
+**Torch implementation AUC** (https://vision.disi.unibo.it/~mpoggi/code.html): 0.1230
+**Tensorflow implementation AUC**: 0.1222
+
+![Alt text](https://github.com/fabiotosi92/CCNN-Tensorflow/blob/master/output/CCNN/auc.png?raw=true "auc")
