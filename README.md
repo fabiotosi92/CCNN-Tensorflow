@@ -38,6 +38,13 @@ Test takes about 0.03 seconds on a single image of **KITTI 2012**  using a 1080T
 
 ```shell
 python ./model/main.py --isTraining False --batch_size 1 --dataset_testing ./utils/kitti_testing_set.txt --checkpoint_path ./log/CCNN.model-595140 --image_width 1320 --image_height 390 --output_path ./output/CCNN/ad-census/
+
+```
+**Warning:** appropriately change of ./utils/kitti_testing_set.txt is necessary to test the network.
+
+```shell
+./utils/kitti_generate_file.sh [path_disparities] [index_from] [index_to] [output_file]
+
 ```
 
 ## Models
