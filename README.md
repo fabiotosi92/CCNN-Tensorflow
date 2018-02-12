@@ -12,11 +12,18 @@ For more details:
 
 ## Requirements
 This code was tested with Tensorflow 1.4, CUDA 8.0 and Ubuntu 16.04.
+Training takes about 15 minutes with the default parameters on 20 images of **KITTI 2012** split on a single 1080Ti GPU card. 
 
 ## Training
 
 ```shell
 python ./model/main.py --isTraining True --epoch 14 --batch_size 64 --patch_size 9 --dataset_training ./utils/kitti_training_set.txt --initial_learning_rate 0.003 --log_directory ./log --save_epoch_freq 2 --model_name CCNN.model 
+```
+
+**Warning:** appropriately change of ./utils/kitti_training_set.txt is necessary to train from scratch the network. To this aim, it's provided a shell script to generate a new list file. 
+
+```shell
+./utils/kitti_generate_file.sh [path_disparities] [path_kitti_groundtruth] [index_from] [index_to] [output_file]
 ```
 
 ## Testing 
