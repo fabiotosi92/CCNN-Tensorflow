@@ -6,6 +6,10 @@ Tensorflow implementation of confidence estimation using a convolutional neural 
 [Matteo Poggi](https://vision.disi.unibo.it/~mpoggi/) and [Stefano Mattoccia](https://vision.disi.unibo.it/~smatt/Site/Home.html)   
 BMVC 2016
 
+
+![Alt text](https://github.com/fabiotosi92/CCNN-Tensorflow/blob/master/images/disparity/ad-census/000020_LR.png?raw=true "disparity")
+![Alt text](https://github.com/fabiotosi92/CCNN-Tensorflow/blob/master/output/CCNN/ad-census/000020_LR.png?raw=true "confidence CCNN")
+
 <p align="center">
   <img src="https://github.com/fabiotosi92/CCNN-Tensorflow/tree/master/images/disparity/ad-census/000020_LR.png" alt="disparity">
 </p>
