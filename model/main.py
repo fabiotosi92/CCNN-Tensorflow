@@ -4,10 +4,6 @@ from model import CCNN
 
 parser = argparse.ArgumentParser(description='Argument parser')
 
-""" Arguments related to network architecture"""
-parser.add_argument('--image_width', dest='image_width', type=int, default=1280, help='width of input images (applicable to both DISPARITY image and GT image)')
-parser.add_argument('--image_height', dest='image_height', type=int, default=386, help='height of input images (applicable to both DISPARITY image and GT image)')
-
 """Arguments related to run mode"""
 parser.add_argument('--isTraining', dest='isTraining', type=str, default='False', help='train, test')
 
@@ -28,23 +24,23 @@ parser.add_argument('--output_path', dest='output_path', type=str, default='../o
 
 args = parser.parse_args()
 
+
 def main(_):
     with tf.Session() as sess:
         model = CCNN(sess,
-                        image_width=args.image_width,
-                        image_height=args.image_height,
-                        isTraining=args.isTraining,
-                        epoch=args.epoch,
-                        batch_size=args.batch_size,
-                        patch_size=args.patch_size,
-                        initial_learning_rate=args.initial_learning_rate,
-                        model_name=args.model_name
-                        )
+                     isTraining=args.isTraining,
+                     epoch=args.epoch,
+                     batch_size=args.batch_size,
+                     patch_size=args.patch_size,
+                     initial_learning_rate=args.initial_learning_rate,
+                     model_name=args.model_name
+                     )
 
         if args.isTraining == 'True':
             model.train(args)
         else:
             model.test(args)
+
 
 if __name__ == '__main__':
     tf.app.run()

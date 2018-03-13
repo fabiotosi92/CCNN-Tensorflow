@@ -31,7 +31,6 @@ class Dataloader(object):
             image.set_shape(shape)
         return image
 
-
     def get_training_patches(self, disp_file, gt_file, patch_size):
 
         disp_list = []
@@ -60,7 +59,6 @@ class Dataloader(object):
         labels = tf.cast(tf.abs(disp_patches - gt_patches) <= 3, tf.float32)
 
         return disp_patches, labels
-
 
     def get_testing_image(self, disp_file):
         return tf.cast(self.read_image(disp_file, [None, None, 1]), tf.float32)

@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 def conv2d(x, kernel_shape, strides=1, relu=True, padding='SAME'):
     W = tf.get_variable("weights", kernel_shape, initializer=tf.contrib.layers.xavier_initializer_conv2d(uniform=False))
     tf.add_to_collection(tf.GraphKeys.WEIGHTS, W)
