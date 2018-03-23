@@ -12,6 +12,7 @@ class CCNN(object):
         self.sess = sess
         self.batch_size = batch_size
         self.patch_size = patch_size
+        self.radius = int(patch_size/2)
         self.initial_learning_rate = initial_learning_rate
         self.isTraining = isTraining
         self.model_name = model_name
@@ -34,28 +35,32 @@ class CCNN(object):
         else:
             self.disp = tf.placeholder(tf.float32, name='disparity') / 255.0
 
+        kernel_size = 3
+        filters = 64
+        fc_filters = 100
+
         with tf.variable_scope('CCNN'):
 
             with tf.variable_scope("conv1"):
-                self.conv1 = ops.conv2d(self.disp, [3, 3, 1, 64], 1, True, padding='VALID')
+                self.conv1 = ops.conv2d(self.disp, [kernel_size, kernel_size, 1, filters], 1, True, padding='VALID')
 
             with tf.variable_scope("conv2"):
-                self.conv2 = ops.conv2d(self.conv1, [3, 3, 64, 64], 1, True, padding='VALID')
+                self.conv2 = ops.conv2d(self.conv1, [kernel_size, kernel_size, filters, filters], 1, True, padding='VALID')
 
             with tf.variable_scope("conv3"):
-                self.conv3 = ops.conv2d(self.conv2, [3, 3, 64, 64], 1, True, padding='VALID')
+                self.conv3 = ops.conv2d(self.conv2, [kernel_size, kernel_size, filters, filters], 1, True, padding='VALID')
 
             with tf.variable_scope("conv4"):
-                self.conv4 = ops.conv2d(self.conv3, [3, 3, 64, 64], 1, True, padding='VALID')
+                self.conv4 = ops.conv2d(self.conv3, [kernel_size, kernel_size, filters, filters], 1, True, padding='VALID')
 
             with tf.variable_scope("fully_connected_1"):
-                self.fc1 = ops.conv2d(self.conv4, [1, 1, 64, 100], 1, True, padding='VALID')
+                self.fc1 = ops.conv2d(self.conv4, [1, 1, filters, fc_filters], 1, True, padding='VALID')
 
             with tf.variable_scope("fully_connected_2"):
-                self.fc2 = ops.conv2d(self.fc1, [1, 1, 100, 100], 1, True, padding='VALID')
+                self.fc2 = ops.conv2d(self.fc1, [1, 1, fc_filters, fc_filters], 1, True, padding='VALID')
 
             with tf.variable_scope("prediction"):
-                self.prediction = ops.conv2d(self.fc2, [1, 1, 100, 1], 1, False, padding='VALID')
+                self.prediction = ops.conv2d(self.fc2, [1, 1, fc_filters, 1], 1, False, padding='VALID')
 
             with tf.variable_scope("variables"):
                 t_vars = tf.trainable_variables()
@@ -79,14 +84,15 @@ class CCNN(object):
         total_num_parameters = 0
         for variable in tf.trainable_variables():
             total_num_parameters += np.array(variable.get_shape().as_list()).prod()
-
         print(" [*] Number of trainable parameters: {}".format(total_num_parameters))
-        init_op = tf.group(tf.global_variables_initializer(),
-                           tf.local_variables_initializer())
+
+        self.sess.run(tf.global_variables_initializer())
+        self.sess.run(tf.local_variables_initializer())
 
         print(' [*] Loading training set...')
-        dataloader = Dataloader(file=args.dataset_training)
-        disp_files, gt_files = dataloader.read_list_file()
+        dataloader = Dataloader(file=args.dataset_training, isTraining=self.isTraining)
+        patch_disp, patch_gt = dataloader.get_training_patches(self.patch_size, args.threshold)
+        line = dataloader.disp_filename
 
         print(' [*] Training data loaded successfully')
         epoch = 0
@@ -96,20 +102,19 @@ class CCNN(object):
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
 
-        self.sess.run(init_op)
+        num_samples = dataloader.count_text_lines(args.dataset_training)
 
         print(" [*] Start Training...")
         while epoch < self.epoch:
-            for i, item in enumerate(disp_files):
-                print(" [*] Loading train image: " + disp_files[i])
-                disp_patches, gt_patches = dataloader.get_training_patches(disp_files[i], gt_files[i], self.patch_size)
-                batch_disp, batch_gt = self.sess.run([disp_patches, gt_patches])
+            for i in range(num_samples):
+                batch_disp, batch_gt, filename = self.sess.run([patch_disp, patch_gt, line])
+                print(" [*] Training image: " + filename)
 
                 step_image = 0
                 while step_image < len(batch_disp):
                     offset = (step_image * self.batch_size) % (batch_disp.shape[0] - self.batch_size)
                     batch_data = batch_disp[offset:(offset + self.batch_size), :, :, :]
-                    batch_labels = batch_gt[offset:(offset +  self.batch_size), int(self.patch_size/2):int(self.patch_size/2)+1, int(self.patch_size/2):int(self.patch_size/2)+1, :]
+                    batch_labels = batch_gt[offset:(offset +  self.batch_size), self.radius:self.radius+1, self.radius:self.radius+1, :]
 
                     _, loss, summary_str = self.sess.run([self.optimizer, self.loss, self.summary_op], feed_dict={self.disp:batch_data, self.gt:batch_labels, self.learning_rate: lr})
 
@@ -137,8 +142,8 @@ class CCNN(object):
 
         self.saver = tf.train.Saver()
 
-        init_op = tf.group(tf.global_variables_initializer(),
-                           tf.local_variables_initializer())
+        self.sess.run(tf.global_variables_initializer())
+        self.sess.run(tf.local_variables_initializer())
 
         if args.checkpoint_path != '':
             self.saver.restore(self.sess, args.checkpoint_path)
@@ -148,27 +153,26 @@ class CCNN(object):
             print(" [*] End Testing...")
             raise ValueError('self.checkpoint_path == ')
 
-        dataloader = Dataloader(file=args.dataset_testing)
-        disp_files, gt_files = dataloader.read_list_file()
-
-        self.prediction = tf.pad(tf.nn.sigmoid(self.prediction), tf.constant([[0, 0], [4, 4,], [4, 4], [0, 0]]), "CONSTANT")
-        self.confmap_png = tf.image.encode_png(tf.cast(tf.scalar_mul(65535.0, tf.squeeze(self.prediction, axis=0)), dtype=tf.uint16))
+        dataloader = Dataloader(file=args.dataset_testing, isTraining=self.isTraining)
+        disp_batch = dataloader.disp
+        line = dataloader.disp_filename
+        prediction = tf.pad(tf.nn.sigmoid(self.prediction), tf.constant([[0, 0], [self.radius, self.radius,], [self.radius, self.radius], [0, 0]]), "CONSTANT")
+        png = tf.image.encode_png(tf.cast(tf.scalar_mul(65535.0, tf.squeeze(prediction, axis=0)), dtype=tf.uint16))
 
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
 
-        self.sess.run(init_op)
+        num_samples = dataloader.count_text_lines(args.dataset_testing)
 
         print(" [*] Start Testing...")
-        for i, item in enumerate(disp_files):
-            print(" [*] Loading test image:" + disp_files[i])
-            disp_patches = dataloader.get_testing_image(disp_files[i])
-            batch_disp = self.sess.run([disp_patches])
+        for step in range(num_samples):
+            batch, filename = self.sess.run([disp_batch, line])
+            print(" [*] Test image:" + filename)
             start = time.time()
-            prediction = self.sess.run(self.confmap_png,feed_dict={self.disp: batch_disp})
+            confidence = self.sess.run(png,feed_dict={self.disp: batch})
             current = time.time()
-            output_file = args.output_path + disp_files[i].strip().split('/')[-1]
-            self.sess.run(tf.write_file(output_file, prediction))
+            output_file = args.output_path + filename.strip().split('/')[-1]
+            self.sess.run(tf.write_file(output_file, confidence))
             print(" [*] CCNN confidence prediction saved in:" + output_file)
             print(" [*] CCNN running time:" + str(current - start) + "s")
 

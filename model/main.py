@@ -14,6 +14,7 @@ parser.add_argument('--patch_size', dest='patch_size', type=int, default=9, help
 parser.add_argument('--dataset_training',  dest='dataset_training', type=str, default='../utils/kitti_training_set.txt', help='dataset training')
 parser.add_argument('--dataset_testing', dest='dataset_testing', type=str, default='../utils/kitti_testing_set.txt', help='dataset testing')
 parser.add_argument('--initial_learning_rate', dest='initial_learning_rate', type=float, default=0.003, help='initial learning rate for gradient descent')
+parser.add_argument('--threshold', dest='threshold', type=float, default=3, help='disparity error if absolute difference between disparity and groundtruth > threshold')
 
 """Arguments related to monitoring and outputs"""
 parser.add_argument('--log_directory', dest='log_directory', type=str, default='../log', help='directory to save checkpoints and summaries')
