@@ -93,6 +93,7 @@ class CCNN(object):
         dataloader = Dataloader(file=args.dataset_training, isTraining=self.isTraining)
         patch_disp, patch_gt = dataloader.get_training_patches(self.patch_size, args.threshold)
         line = dataloader.disp_filename
+        num_samples = dataloader.count_text_lines(args.dataset_training)
 
         print(' [*] Training data loaded successfully')
         epoch = 0
@@ -101,8 +102,6 @@ class CCNN(object):
 
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
-
-        num_samples = dataloader.count_text_lines(args.dataset_training)
 
         print(" [*] Start Training...")
         while epoch < self.epoch:
@@ -156,13 +155,13 @@ class CCNN(object):
         dataloader = Dataloader(file=args.dataset_testing, isTraining=self.isTraining)
         disp_batch = dataloader.disp
         line = dataloader.disp_filename
+        num_samples = dataloader.count_text_lines(args.dataset_testing)
+        
         prediction = tf.pad(tf.nn.sigmoid(self.prediction), tf.constant([[0, 0], [self.radius, self.radius,], [self.radius, self.radius], [0, 0]]), "CONSTANT")
         png = tf.image.encode_png(tf.cast(tf.scalar_mul(65535.0, tf.squeeze(prediction, axis=0)), dtype=tf.uint16))
 
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
-
-        num_samples = dataloader.count_text_lines(args.dataset_testing)
 
         print(" [*] Start Testing...")
         for step in range(num_samples):

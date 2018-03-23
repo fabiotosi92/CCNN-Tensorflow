@@ -34,7 +34,7 @@ python ./model/main.py --isTraining True --epoch 14 --batch_size 64 --patch_size
 
 ## Testing 
 
-Test takes about 0.03 seconds on a single image of **KITTI 2012**  using a 1080Ti GPU card. 
+Test takes about 0.07 seconds on a single image of **KITTI 2012**  using a 1080Ti GPU card. 
 
 ```shell
 python ./model/main.py --isTraining False --batch_size 1 --dataset_testing ./utils/kitti_testing_set.txt --checkpoint_path ./log/CCNN.model-595140 --output_path ./output/CCNN/ad-census/
