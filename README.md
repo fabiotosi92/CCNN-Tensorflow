@@ -55,7 +55,7 @@ The model was trained for 14 epochs, a batch size of 64, an initial learning rat
 
 ## Results
 
-AUC comparison between Torch and Tensorflow implementation using disparity maps computed by AD-CENSUS algorithm on 174 testing images of **KITTI 2012**
+AUC comparison between Torch and Tensorflow implementations using disparity maps computed by AD-CENSUS algorithm on 174 testing images of **KITTI 2012**
 
 **Optimal AUC**: 0.1073  
 **Torch implementation AUC** (https://vision.disi.unibo.it/~mpoggi/code.html): 0.1230  
